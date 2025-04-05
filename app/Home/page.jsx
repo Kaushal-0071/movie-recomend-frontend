@@ -4,6 +4,7 @@ import React, {  useContext, useEffect, useState } from "react";
 import { GenreContext } from "../context/GenreContext";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
+import { MovieCard } from "@/components/moviecard";
 
 const HomePage = () => {
   const { Genre, setGenre } = useContext(GenreContext);
@@ -57,7 +58,10 @@ const router = useRouter(); // Import useRouter from next/router
   return (
     <>
        <GenreSelector />
-       <Button onClick={ fetchgenre}>Submit</Button>
+       <div className="flex justify-center items-center mt-4">
+
+       <Button onClick={ fetchgenre}>Get recommendations</Button>
+       </div>
       <div className="max-w-5xl mx-auto p-6">
       <h1 className="text-3xl font-bold text-center mb-6">Movie Recommendations</h1>
       {GenreData.length > 0  && !loading ? (
@@ -65,13 +69,7 @@ const router = useRouter(); // Import useRouter from next/router
           {GenreData.map((movie, index) => (
 
             <button onClick={()=>goToMoviePage(movie.title)} key={index}>
-            <div key={index} className="bg-white rounded-lg shadow-lg p-4 hover:shadow-xl transition-shadow cursor-pointer">
-              <h2 className="text-xl font-semibold">{movie.title}</h2>
-              <p className="text-gray-500"><strong>Genre:</strong> {movie.genre}</p>
-              <p className="text-gray-500"><strong>Runtime:</strong> {movie.runtime} min</p>
-              <p className="text-gray-500"><strong>Score:</strong> {movie.score.toFixed(2)}</p>
-              <p className="text-gray-500"><strong>Vote Average:</strong> {movie.vote_average}</p>
-            </div>
+           <MovieCard movieName={movie.title} />
               </button>
           ))}
         </div>

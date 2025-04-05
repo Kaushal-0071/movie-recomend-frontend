@@ -1,5 +1,7 @@
 "use client"
 import RecommendationUI from '@/components/ragRecomendation'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
 import React, { useState } from 'react'
 
 const Rag= () => {
@@ -33,12 +35,19 @@ const fetchRagRecommendations = async () => {
   };
   
   return (
-    <div className='flex flex-col items-center justify-center py-5'>
-
-        <input placeholder='enter prompt' className=' flex items-center justify-center' onChange={(e)=> setPrompt(e.target.value)}/>
-        <button className='bg-blue-500 text-white px-4 py-2 rounded mt-2' onClick={fetchRagRecommendations}>Submit</button>
-        {ragData && <RecommendationUI recommendation={ragData}/>}
+    <div className="flex flex-col items-center justify-center py-8 space-y-4">
+    <div className="w-full max-w-md">
+      <Input 
+        placeholder="Enter prompt" 
+        onChange={(e) => setPrompt(e.target.value)}
+      />
     </div>
+    <Button onClick={fetchRagRecommendations}>
+      Submit
+    </Button>
+    {ragData && <RecommendationUI recommendation={ragData} />}
+  </div>
+  
   )
 }
 

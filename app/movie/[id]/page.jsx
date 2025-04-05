@@ -1,9 +1,16 @@
 "use client";
 
 import { LikedMoviesContext } from "@/app/context/LikedMoviesContext";
-import { Button } from "@/components/ui/button";
+import { MovieCard } from "@/components/moviecard";
+
 import { useParams, useRouter } from "next/navigation";
 import React, { use, useContext, useEffect, useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+
+import { Heart, Film, Loader2 } from "lucide-react";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Separator } from "@/components/ui/separator";
 
 const Movie = () => {
   const [movies, setMovies] = useState([]);
@@ -15,6 +22,8 @@ const Movie = () => {
   useEffect(() => {
     if (LikedMovies.length > 0) {
       localStorage.setItem("likedMovies", JSON.stringify(LikedMovies));
+    }else{
+      localStorage.setItem("likedMovies", JSON.stringify([]));
     }
   }, [LikedMovies]);
 const router = useRouter(); 
@@ -66,38 +75,83 @@ useEffect(() => {
   }
 
   return (
-    <>
-      <div className="mt-4 text-5xl font-bold mb-4">{decodedTitle}</div>
+    
+   <div className="min-h-screen bg-background">
+      <div className="container mx-auto px-4 py-8">
+        <div className="grid md:grid-cols-[1fr,200px] grid-cols-2 gap-8">
+          {/* Main Content */}
+          <div className="space-y-6 ">
+            <MovieCard 
+              movieName={decodedTitle} 
+              className="w-full max-w-none shadow-xl" 
+            />
+            
+            <div className="flex justify-center">
+              <Button
+                onClick={() => setlikes(decodedTitle)}
+                size="lg"
+                className="group"
+              >
+                <Heart className="mr-2 h-5 w-5 group-hover:fill-current transition-all duration-300" />
+                Like this movie
+              </Button>
+            </div>
+          </div>
 
-      {/* ✅ Button is now outside of the fetching logic */}
-      <Button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" onClick={() => setlikes(decodedTitle)}>
-        Like
-      </Button>
+          {/* Recommendations Sidebar */}
+          <Card className="h-fit ">
+            <div className="p-6 border-b">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Film className="h-5 w-5 text-primary" />
+                  <h2 className="text-xl font-semibold">Recommendations</h2>
+                </div>
+                {loading && (
+                  <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
+                )}
+              </div>
+            </div>
 
-      <div className="min-h-screen bg-gray-900 text-white flex flex-col items-center p-6">
-        <h1 className="text-3xl font-bold mb-6">Recommended Movies</h1>
-        <div className="w-full max-w-2xl">
-          {loading ? ( // ✅ Show loading while fetching
-            <p className="text-gray-400 text-lg">Loading recommendations...</p>
-          ) : movies.length > 0 ? (
-            <ul className="bg-gray-800 rounded-lg p-4 shadow-lg">
-              {movies.map((movie, index) => (
-                <Button key={index} onClick={() => goToMoviePage(movie)}>
-                <li
-                  key={index}
-                  className="p-3 border-b border-gray-700 last:border-none hover:bg-gray-700 rounded-md cursor-pointer transition duration-200"
-                >
-                  🎬 {movie}
-                </li>
-                </Button>
-              ))}
-            </ul>
-          ) : (
-            <p className="text-gray-400 text-lg">No recommendations available.</p>
-          )}
+            <ScrollArea className="h-[600px]">
+              {loading ? (
+                <div className="p-6 text-center text-muted-foreground">
+                  Finding similar movies...
+                </div>
+              ) : movies.length > 0 ? (
+                <div className="p-2">
+                  {movies.map((movie, index) => (
+                    <div key={index} className="relative">
+                      <Button
+                        variant="ghost"
+                        className="w-full px-4 py-3 h-auto justify-start text-left rounded-lg hover:bg-accent group"
+                        onClick={() => goToMoviePage(movie)}
+                      >
+                        <div className="flex items-center gap-3">
+                          <div className="flex-shrink-0 w-12 h-16 bg-muted rounded flex items-center justify-center">
+                            <Film className="h-6 w-6 text-muted-foreground group-hover:text-primary transition-colors" />
+                          </div>
+                          <div>
+                            <p className="font-medium line-clamp-1">{movie}</p>
+                            <p className="text-sm text-muted-foreground">Click to view details</p>
+                          </div>
+                        </div>
+                      </Button>
+                      {index !== movies.length - 1 && (
+                        <Separator className="my-2" />
+                      )}
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="p-6 text-center text-muted-foreground">
+                  No recommendations available at the moment.
+                </div>
+              )}
+            </ScrollArea>
+          </Card>
         </div>
       </div>
-    </>
+    </div>
   );
 };
 

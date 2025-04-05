@@ -3,6 +3,8 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import Papa from 'papaparse';
 import { useRouter } from 'next/navigation';
+import { Label } from './ui/label';
+import { Input } from './ui/input';
 
 const SearchCSV = () => {
   const [csvData, setCsvData] = useState([]);
@@ -100,36 +102,46 @@ function goToMoviePage(movieTitle) {
 }
 
   return (
-    <div className="p-4">
+    <div className="p-4 max-w-lg mx-auto">
       <div className="mb-4">
-        <input
+        <Label htmlFor="movie-search" className="mb-1 block">
+          Search by title
+        </Label>
+        <Input
+          id="movie-search"
           type="text"
           placeholder="Search by title..."
           value={searchTerm}
           onChange={handleSearchChange}
-          className="w-full p-2 border rounded"
+          className="w-full"
         />
       </div>
-      
-      {loading && <div>Loading CSV data...</div>}
-      
+
+      {loading && (
+        <div className="text-center text-sm text-gray-600">
+          Loading CSV data...
+        </div>
+      )}
+
       {debouncedSearchTerm && !loading && (
         <div>
-          <p className="mb-2">Found {searchResults.length} results</p>
+          <p className="mb-2 text-sm text-gray-600">
+            Found {searchResults.length} result{searchResults.length !== 1 && 's'}
+          </p>
           {searchResults.length > 0 ? (
             <ul className="border rounded divide-y">
-                
               {searchResults.map((movie) => (
-                <button key={movie.movieId} onClick={()=>goToMoviePage(movie.title)}>
-                <li key={movie.movieId} className="p-2 hover:bg-gray-100">
+                <li
+                  key={movie.movieId}
+                  className="p-2 hover:bg-gray-100 cursor-pointer transition-colors"
+                  onClick={() => goToMoviePage(movie.title)}
+                >
                   <strong>{movie.title}</strong>
                 </li>
-                </button>
               ))}
-             
             </ul>
           ) : (
-            <p>No results found.</p>
+            <p className="text-sm text-gray-600">No results found.</p>
           )}
         </div>
       )}

@@ -3,6 +3,7 @@ import React, { use, useContext, useEffect, useState } from 'react'
 import { LikedMoviesContext } from '../context/LikedMoviesContext';
 import { UseridContext } from '../context/Useridcontex';
 import { useRouter } from 'next/navigation';
+import { MovieCard } from '@/components/moviecard';
 
 const Hybrid = () => {
   const {LikedMovies, setLikedMovies} = useContext(LikedMoviesContext);
@@ -102,24 +103,22 @@ function goToMoviePage(movieTitle) {
     <div className="p-6">
       <h2 className="text-2xl font-semibold mb-4">Recommended Movies</h2>
 
+
       {loading ? (
         <p className="text-gray-500">Fetching recommendations...</p>
       ) : moviesRecomended.length === 0 ? (
         <p className="text-gray-500">No recommendations available.</p>
       ) : (
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-          {moviesRecomended.map((movie, index) => (
-            <button onClick={()=>goToMoviePage(movie)} key={index} className='cursor-pointer'>
-            <div
-              key={index}
-              className="p-4 bg-gray-800 text-white rounded-lg shadow-lg"
-            >
-              <h3 className="text-lg font-medium">{movie}</h3>
-            </div>
-            </button>
-          ))}
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 ">
+        {[...new Set(moviesRecomended)].map((movie, index) => (
+  <button onClick={() => goToMoviePage(movie)} key={index} className='cursor-pointer hover:scale-110 transition-all'>
+    <MovieCard movieName={movie} />
+  </button>
+))}
+
         </div>
       )}
+
     </div>
     </>
 

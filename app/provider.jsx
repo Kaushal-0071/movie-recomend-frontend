@@ -12,6 +12,7 @@ const Provider = ({ children }) => {
     <UseridContext.Provider value={{Userid, setUserid}}>
       <LikedMoviesContext.Provider value={{LikedMovies, setLikedMovies}}>
         <GenreContext.Provider value={{Genre, setGenre}}>
+          
           {children}
         </GenreContext.Provider>
       </LikedMoviesContext.Provider>
