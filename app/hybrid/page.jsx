@@ -13,6 +13,12 @@ const [moviesRecomended, setmoviesRecomended] = useState([]);
 const router = useRouter(); // Import useRouter from next/router
 
 useEffect(() => {
+  const storedUserid = localStorage.getItem("Userid");
+  if (storedUserid) {
+    setUserid(storedUserid);
+  }
+}, []);
+useEffect(() => {
   const storedLikedMovies = localStorage.getItem("likedMovies");
   if (storedLikedMovies) {
     setLikedMovies(JSON.parse(storedLikedMovies));

@@ -10,10 +10,10 @@ const RecommendationUI = ({ recommendation }) => {
       <h2 className="text-xl font-bold text-gray-800">Recommended Movie</h2>
       <div className="border p-4 rounded-lg mt-2">
         <h3 className="text-lg font-semibold">{recommended_movie.title}</h3>
-        <p><strong>Director:</strong> {recommended_movie.director}</p>
-        <p><strong>Genre:</strong> {recommended_movie.genre}</p>
-        <p><strong>Release Year:</strong> {recommended_movie.release_year}</p>
-        <p><strong>Cast:</strong> {recommended_movie.cast}</p>
+        
+        <p><strong>Genre:</strong> {recommended_movie.genres}</p>
+        <p><strong>Release Year:</strong> {recommended_movie.release_date}</p>
+       
         <p className="mt-2 text-gray-600">{recommendation_reason}</p>
       </div>
 
@@ -22,10 +22,10 @@ const RecommendationUI = ({ recommendation }) => {
         {similar_movies.map((movie, index) => (
           <div key={index} className="border p-4 rounded-lg">
             <h3 className="text-lg font-semibold">{movie.title}</h3>
-            <p><strong>Director:</strong> {movie.director}</p>
-            <p><strong>Genre:</strong> {movie.genre}</p>
-            <p><strong>Release Year:</strong> {movie.release_year}</p>
-            <p className="text-sm text-gray-600">{movie.plot}</p>
+            <p><strong>language:</strong> {movie.original_language}</p>
+            <p><strong>Genre:</strong> {movie.genres}</p>
+            <p><strong>Release Year:</strong> {movie.release_date}</p>
+            <p className="text-sm text-gray-600">{movie.overview}</p>
           </div>
         ))}
       </div>

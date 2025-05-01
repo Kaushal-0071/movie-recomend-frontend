@@ -7,17 +7,44 @@ import { useParams, useRouter } from "next/navigation";
 import React, { use, useContext, useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { Rating } from "primereact/rating";
 
-import { Heart, Film, Loader2 } from "lucide-react";
+import { Heart, Film, Loader2, User } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
+import { UseridContext } from "@/app/context/Useridcontex";
 
 const Movie = () => {
   const [movies, setMovies] = useState([]);
+
+  const {Userid, setUserid}  =useContext(UseridContext);
+  useEffect(() => {
+    const storedUserid = localStorage.getItem("Userid");
+    if (storedUserid) {
+      setUserid(storedUserid);
+    }
+  }, []);
   const [loading, setLoading] = useState(true);
   const { id } = useParams(); // Get movie title from URL
   const {LikedMovies, setLikedMovies} = useContext(LikedMoviesContext); // Import LikedMoviesContext  
   const decodedTitle = decodeURIComponent(id); // Decode the title
+const [value, setValue] = useState(0);
+
+  // Load rating from localStorage on mount
+   // Load rating from localStorage on mount
+   useEffect(() => {
+     const storedRating = localStorage.getItem(`rating_${decodedTitle}`);
+     if (storedRating) {
+       setValue(parseInt(storedRating));
+     }
+   }, []);
+ 
+   // Store rating to localStorage when value changes
+   useEffect(() => {
+     if (value !== 0) {
+       localStorage.setItem(`rating_${decodedTitle}`, value.toString());
+     }
+   }, [value]);
 
   useEffect(() => {
     if (LikedMovies.length > 0) {
@@ -26,6 +53,7 @@ const Movie = () => {
       localStorage.setItem("likedMovies", JSON.stringify([]));
     }
   }, [LikedMovies]);
+
 const router = useRouter(); 
   useEffect(() => {
     const fetchContentBased = async () => {
@@ -56,19 +84,59 @@ const router = useRouter();
       fetchContentBased();
     }
   }, [decodedTitle]);
+
+
+  async function submitRating(userId, title, rating, display = 10) {
+    try {
+      const response = await fetch("http://localhost:5000/rate", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          userId,
+          title,
+          rating,
+          display
+        })
+      });
+  
+      const data = await response.json();
+  
+      if (!response.ok) {
+        throw new Error(data.error || "Failed to submit rating");
+      }
+  
+    
+      
+  
+    } catch (err) {
+      console.error("❌ Error submitting rating:", err.message);
+      return [];
+    }
+  }
+  
 useEffect(() => {
   console.log("Liked Movies:", LikedMovies);  },[LikedMovies]); // Log liked movies whenever they change
 
-  const setlikes=(movie) => {
-    if(LikedMovies.includes(movie)) {
-     setLikedMovies(LikedMovies.filter((m) => m !== movie)); // Remove the movie if already liked
-    }else{
-      setLikedMovies([...LikedMovies, movie]); // Add the new movie to the liked movies
+  // const setlikes=(movie) => {
+  //   if(LikedMovies.includes(movie)) {
+  //    setLikedMovies(LikedMovies.filter((m) => m !== movie)); // Remove the movie if already liked
+  //   }else{
+  //     setLikedMovies([...LikedMovies, movie]); // Add the new movie to the liked movies
+  //   }
+  //    // Log the liked movies
+
+  // }
+  const likeIfHighRating = (movie, rating) => {
+    submitRating(Userid, movie, rating); // Call the function to submit the rating
+    if (rating > 4 && !LikedMovies.includes(movie)) {
+      setLikedMovies([...LikedMovies, movie]);
+    } else if (rating <= 4 && LikedMovies.includes(movie)) {
+      setLikedMovies(LikedMovies.filter((m) => m !== movie));
     }
-     // Log the liked movies
-
-  }
-
+  };
+  
   function goToMoviePage(movieTitle) {
     const encodedTitle = encodeURIComponent(movieTitle); // Encode title for URL
     router.push(`/movie/${encodedTitle}`); // Navigate to /movie/[title]
@@ -87,14 +155,14 @@ useEffect(() => {
             />
             
             <div className="flex justify-center">
-              <Button
-                onClick={() => setlikes(decodedTitle)}
-                size="lg"
-                className="group"
-              >
-                <Heart className="mr-2 h-5 w-5 group-hover:fill-current transition-all duration-300" />
-                Like this movie
-              </Button>
+               <Rating
+                      value={value}
+                      onChange={(e) => {
+                        setValue(e.value);
+                        likeIfHighRating(decodedTitle, e.value);
+                      }}
+                      cancel={false}
+                    />
             </div>
           </div>
 
